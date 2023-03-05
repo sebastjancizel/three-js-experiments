@@ -1,59 +1,100 @@
 import './style.css';
 
 import * as THREE from 'three';
-import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
-import { ParametricGeometries } from 'three/examples/jsm/geometries/ParametricGeometries.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
+// initialize the fundamental three.js objects
 const scene = new THREE.Scene();
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-const material = new THREE.MeshStandardMaterial({ color: 0xFF63647, wireframe: false}); // color from firebase io tutorial
-const torus = new THREE.Mesh(geometry, material);
-scene.add(torus);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.minDistance = 20;
+controls.maxDistance = 50;
+controls.maxPolarAngle = Math.PI / 2;
 
-camera.position.z = 30;
+const group = new THREE.Group();
+scene.add(group);
 
-const geo= new ParametricGeometry( ParametricGeometries.klein, 25, 25);
-const mat = new THREE.MeshStandardMaterial( { color: 0xFF63647, wireframe:false } );
-const klein = new THREE.Mesh( geo , mat );
-scene.add( klein );
+// add a torus
+let geometry = new THREE.TorusGeometry(10, 3, 16, 200);
+geometry.deleteAttribute('normal');
+geometry.deleteAttribute('uv');
+geometry = BufferGeometryUtils.mergeVertices(geometry);
 
-const pointLight = new THREE.PointLight(0xffffff);
-pointLight.position.set(20, 20, 20);
+camera.position.x = 30;
 
-const ambientLight = new THREE.AmbientLight(0xffffff);
-scene.add(pointLight);
+// create a material for the points
+const pointsMaterial = new THREE.PointsMaterial( { size: 0.1, color: 0xff6346, sizeAttenuation: true } );
 
-const lightHelper = new THREE.PointLightHelper(pointLight);
-scene.add(lightHelper);
+// get vertices from the torus
+const vertices = geometry.attributes.position;
+const array = [];
+// iterate through the vertices and add them to the array
+for (let i = 0; i < vertices.count; i++) {
+  const vertex = new THREE.Vector3();
+  vertex.fromBufferAttribute(vertices, i);
+  array.push(vertex);
+}
 
-//set backround color to #757575
-scene.background = new THREE.Color(0x424242);
+// create a geometry for the points
+const pointsGeometry = new THREE.BufferGeometry().setFromPoints(array);
+
+// create the points
+const points = new THREE.Points(pointsGeometry, pointsMaterial);
+group.add(points);
+
+const meshMaterial = new THREE.MeshLambertMaterial({
+  color: 0xffffff,
+  opacity: 0.5,
+  side: THREE.DoubleSide,
+  transparent: true,
+})
+
+const meshGeometry = new THREE.BufferGeometry().setFromPoints(array);
+const mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+
+
+//add light
+// const pointLight = new THREE.PointLight(0xffffff);
+// pointLight.position.set(20, 20, 20);
+// scene.add(pointLight)
+
+// add helpers
+// const lightHelper = new THREE.PointLightHelper(pointLight);
+// scene.add(lightHelper);
 
 const gridHelper = new THREE.GridHelper(200, 50);
 scene.add(gridHelper);
-//add axes helper
+
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
-const controls = new OrbitControls(camera, renderer.domElement);
 
 function animate() {
 	requestAnimationFrame(animate);
 
-	torus.rotation.x += 0.01;
-	torus.rotation.y += 0.01;
   //change the disctance of the camera with scroll
 
   controls.update();
 
+  window.addEventListener('resize', onWindowResize,);
+
 	renderer.render(scene, camera);
+}
+
+function onWindowResize() {
+
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+
 }
 
 //add wheel event listener
