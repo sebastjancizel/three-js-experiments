@@ -1,110 +1,166 @@
-import './style.css';
-
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-// initialize the fundamental three.js objects
-const scene = new THREE.Scene();
+import Stats from 'three/addons/libs/stats.module.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+// key particle settings here
+const SEPARATION = 50, AMOUNTX = 100, AMOUNTY = 100;
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+let container, stats;
+let camera, scene, renderer;
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.minDistance = 20;
-controls.maxDistance = 50;
-controls.maxPolarAngle = Math.PI / 2;
+let particles, count = 0;
 
-const group = new THREE.Group();
-scene.add(group);
+let mouseX = 0, mouseY = 0;
 
-// add a torus
-let geometry = new THREE.TorusGeometry(10, 3, 16, 200);
-geometry.deleteAttribute('normal');
-geometry.deleteAttribute('uv');
-geometry = BufferGeometryUtils.mergeVertices(geometry);
+let windowHalfX = window.innerWidth;
+let windowHalfY = window.innerHeight;
 
-camera.position.x = 30;
+init();
+animate();
 
-// create a material for the points
-const pointsMaterial = new THREE.PointsMaterial( { size: 0.1, color: 0xff6346, sizeAttenuation: true } );
+function init() {
 
-// get vertices from the torus
-const vertices = geometry.attributes.position;
-const array = [];
-// iterate through the vertices and add them to the array
-for (let i = 0; i < vertices.count; i++) {
-  const vertex = new THREE.Vector3();
-  vertex.fromBufferAttribute(vertices, i);
-  array.push(vertex);
-}
+  container = document.createElement('div');
+  document.body.appendChild(container);
 
-// create a geometry for the points
-const pointsGeometry = new THREE.BufferGeometry().setFromPoints(array);
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+  camera.position.z = 1000;
 
-// create the points
-const points = new THREE.Points(pointsGeometry, pointsMaterial);
-group.add(points);
+  scene = new THREE.Scene();
 
-const meshMaterial = new THREE.MeshLambertMaterial({
-  color: 0xffffff,
-  opacity: 0.5,
-  side: THREE.DoubleSide,
-  transparent: true,
-})
+  //
 
-const meshGeometry = new THREE.BufferGeometry().setFromPoints(array);
-const mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+  const numParticles = AMOUNTX * AMOUNTY;
 
+  const positions = new Float32Array(numParticles * 3);
+  const scales = new Float32Array(numParticles);
 
-//add light
-// const pointLight = new THREE.PointLight(0xffffff);
-// pointLight.position.set(20, 20, 20);
-// scene.add(pointLight)
+  let i = 0, j = 0;
 
-// add helpers
-// const lightHelper = new THREE.PointLightHelper(pointLight);
-// scene.add(lightHelper);
+  for (let ix = 0; ix < AMOUNTX; ix++) {
 
-const gridHelper = new THREE.GridHelper(200, 50);
-scene.add(gridHelper);
+    for (let iy = 0; iy < AMOUNTY; iy++) {
 
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+      positions[i] = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2); // x
+      positions[i + 1] = 0; // y
+      positions[i + 2] = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2); // z
 
+      scales[j] = 0.5;
 
-function animate() {
-	requestAnimationFrame(animate);
+      i += 3;
+      j++;
 
-  //change the disctance of the camera with scroll
+    }
+  }
 
-  controls.update();
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
 
-  window.addEventListener('resize', onWindowResize,);
+  const material = new THREE.ShaderMaterial({
 
-	renderer.render(scene, camera);
+    uniforms: {
+      color: { value: new THREE.Color(0xffffff) },
+    },
+    vertexShader: document.getElementById('vertexshader').textContent,
+    fragmentShader: document.getElementById('fragmentshader').textContent
+
+  });
+
+  //
+
+  particles = new THREE.Points(geometry, material);
+  scene.add(particles);
+
+  //
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container.appendChild(renderer.domElement);
+
+  container.style.touchAction = 'none';
+  container.addEventListener('pointermove', onPointerMove);
+
+  //
+
+  window.addEventListener('resize', onWindowResize);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.minDistance = 20;
+
 }
 
 function onWindowResize() {
 
+  windowHalfX = window.innerWidth / 2;
+  windowHalfY = window.innerHeight / 2;
+
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
 }
 
-//add wheel event listener
-document.addEventListener('wheel', (event) => {
-  //check the direction of the scroll and update the camera position accordingly
-  if (event.deltaY > 0) {
-    camera.position.z += 1;
-  } else {
-    camera.position.z -= 1;
-  }
-});
+//
 
-animate();
+function onPointerMove(event) {
+
+  if (event.isPrimary === false) return;
+
+  mouseX = event.clientX - windowHalfX;
+  mouseY = event.clientY - windowHalfY;
+
+}
+
+//
+
+function animate() {
+
+  requestAnimationFrame(animate);
+
+  render();
+  stats.update();
+
+}
+
+function render() {
+
+  // camera.position.x += (mouseX - camera.position.x) * .05;
+  // camera.position.y += (- mouseY - camera.position.y) * .05;
+  // camera.lookAt(scene.position);
+
+  const positions = particles.geometry.attributes.position.array;
+  const scales = particles.geometry.attributes.scale.array;
+
+  let i = 0, j = 0;
+
+  for (let ix = 0; ix < AMOUNTX; ix++) {
+
+    for (let iy = 0; iy < AMOUNTY; iy++) {
+
+      positions[i + 1] = (Math.sin((ix + count) * 0.3) * 50) +
+        (Math.sin((iy + count) * 0.5) * 50);
+
+      scales[j] = (Math.sin((ix + count) * 0.3) + 1) * 20 +
+        (Math.sin((iy + count) * 0.5) + 1) * 20;
+
+      scales[j] /= 2;
+
+      i += 3;
+      j++;
+
+    }
+
+  }
+
+  particles.geometry.attributes.position.needsUpdate = true;
+  particles.geometry.attributes.scale.needsUpdate = true;
+
+  renderer.render(scene, camera);
+
+  count += 0.1;
+
+}
