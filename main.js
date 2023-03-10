@@ -89,10 +89,11 @@ function init() {
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.minDistance = 20;
+  controls.maxDistance = 4000;
 
-  // add axis helper
-  const axesHelper = new THREE.AxesHelper(1000);
-  scene.add(axesHelper);
+  // // add axis helper
+  // const axesHelper = new THREE.AxesHelper(1000);
+  // scene.add(axesHelper);
   // add text
 }
 function onWindowResize() {
@@ -161,4 +162,9 @@ function render() {
 
   count += 0.05;
 
+  // add a constant angular velocity camera rotation around y axis
+  camera.position.x = 3000 * Math.cos(0.01 * count);
+  camera.position.z = 3000 * Math.sin(0.01 * count);
+
+  camera.lookAt(scene.position);
 }
