@@ -4,7 +4,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // key particle settings here
-const SEPARATION = 50, AMOUNTX = 100, AMOUNTY = 100;
+const SEPARATION = 100, AMOUNTX = 100, AMOUNTY = 100;
 
 let container, stats;
 let camera, scene, renderer;
@@ -23,13 +23,17 @@ function init() {
 
   container = document.createElement('div');
   document.body.appendChild(container);
+  //make the container fill the right half of the screen
+  container.style.width = '20%';
+  container.style.height = '100%';
+
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-  camera.position.z = 1000;
+  camera.position.x = 3000;
+  camera.position.y = 200;
+  camera.position.z = 3000;
 
   scene = new THREE.Scene();
-
-  //
 
   const numParticles = AMOUNTX * AMOUNTY;
 
@@ -46,7 +50,7 @@ function init() {
       positions[i + 1] = 0; // y
       positions[i + 2] = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2); // z
 
-      scales[j] = 0.5;
+      scales[j] = 0.2;
 
       i += 3;
       j++;
@@ -68,12 +72,8 @@ function init() {
 
   });
 
-  //
-
   particles = new THREE.Points(geometry, material);
   scene.add(particles);
-
-  //
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -83,12 +83,14 @@ function init() {
   container.style.touchAction = 'none';
   container.addEventListener('pointermove', onPointerMove);
 
-  //
-
   window.addEventListener('resize', onWindowResize);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.minDistance = 20;
+
+  // add axis helper
+  const axesHelper = new THREE.AxesHelper(1000);
+  scene.add(axesHelper);
 
 }
 
@@ -115,7 +117,12 @@ function onPointerMove(event) {
 
 }
 
-//
+function onScroll(event) {
+
+  camera.position.z += event.deltaY * 0.05;
+
+}
+
 
 function animate() {
 
@@ -128,10 +135,6 @@ function animate() {
 
 function render() {
 
-  // camera.position.x += (mouseX - camera.position.x) * .05;
-  // camera.position.y += (- mouseY - camera.position.y) * .05;
-  // camera.lookAt(scene.position);
-
   const positions = particles.geometry.attributes.position.array;
   const scales = particles.geometry.attributes.scale.array;
 
@@ -142,7 +145,7 @@ function render() {
     for (let iy = 0; iy < AMOUNTY; iy++) {
 
       positions[i + 1] = (Math.sin((ix + count) * 0.3) * 50) +
-        (Math.sin((iy + count) * 0.5) * 50);
+        (Math.cos((iy + count) * 0.5) * 50);
 
       scales[j] = (Math.sin((ix + count) * 0.3) + 1) * 20 +
         (Math.sin((iy + count) * 0.5) + 1) * 20;
@@ -161,6 +164,6 @@ function render() {
 
   renderer.render(scene, camera);
 
-  count += 0.1;
+  count += 0.05;
 
 }
