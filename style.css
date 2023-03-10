@@ -4,3 +4,121 @@ body {
   font-family: sans-serif;
   background: #000000;
 }
+
+/* center the info div, make it large and use fira code font */
+#info {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  padding: 40px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* make h1 text color white and very large */
+#info h1 {
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  font-size: 50px;
+}
+
+/* make h2 text color white and large */
+#info h2 {
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+/* make h2 text color white and large */
+#info h3 {
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+/* make the button white with black text */
+button {
+  margin: 0;
+  padding: 10px 20px;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* make the button white with black text */
+button:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:active {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:focus {
+  outline: none;
+}
+
+/* make the button white with black text */
+button:disabled {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:disabled:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:disabled:active {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:disabled:focus {
+  outline: none;
+}
+
+/* make the button white with black text */
+button:disabled:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:disabled:active {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:disabled:focus {
+  outline: none;
+}
+
+/* make the button white with black text */
+button:disabled:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* make the button white with black text */
+button:disabled:active {
+  background: #fff;
+  color: #000;
+}

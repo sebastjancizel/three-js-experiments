@@ -4,7 +4,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // key particle settings here
-const SEPARATION = 100, AMOUNTX = 100, AMOUNTY = 100;
+const SEPARATION = 200, AMOUNTX = 50, AMOUNTY = 50;
 
 let container, stats;
 let camera, scene, renderer;
@@ -24,8 +24,6 @@ function init() {
   container = document.createElement('div');
   document.body.appendChild(container);
   //make the container fill the right half of the screen
-  container.style.width = '20%';
-  container.style.height = '100%';
 
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
@@ -34,6 +32,8 @@ function init() {
   camera.position.z = 3000;
 
   scene = new THREE.Scene();
+  // set background color to dark grey
+  scene.background = new THREE.Color(0x111111);
 
   const numParticles = AMOUNTX * AMOUNTY;
 
@@ -50,13 +50,14 @@ function init() {
       positions[i + 1] = 0; // y
       positions[i + 2] = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2); // z
 
-      scales[j] = 0.2;
+      scales[j] = 15;
 
       i += 3;
       j++;
 
     }
   }
+
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -75,6 +76,7 @@ function init() {
   particles = new THREE.Points(geometry, material);
   scene.add(particles);
 
+
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -91,9 +93,8 @@ function init() {
   // add axis helper
   const axesHelper = new THREE.AxesHelper(1000);
   scene.add(axesHelper);
-
+  // add text
 }
-
 function onWindowResize() {
 
   windowHalfX = window.innerWidth / 2;
@@ -129,7 +130,6 @@ function animate() {
   requestAnimationFrame(animate);
 
   render();
-  stats.update();
 
 }
 
@@ -145,12 +145,7 @@ function render() {
     for (let iy = 0; iy < AMOUNTY; iy++) {
 
       positions[i + 1] = (Math.sin((ix + count) * 0.3) * 50) +
-        (Math.cos((iy + count) * 0.5) * 50);
-
-      scales[j] = (Math.sin((ix + count) * 0.3) + 1) * 20 +
-        (Math.sin((iy + count) * 0.5) + 1) * 20;
-
-      scales[j] /= 2;
+        (Math.cos((iy + count) * 0.5) * 50)
 
       i += 3;
       j++;
