@@ -4,7 +4,8 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // key particle settings here
-const SEPARATION = 200, AMOUNTX = 50, AMOUNTY = 50;
+const SEPARATION = 200, AMOUNTX = 75, AMOUNTY = 75;
+const MAX_CAMERA_Y = 200;
 
 let container, stats;
 let camera, scene, renderer;
@@ -26,9 +27,9 @@ function init() {
   //make the container fill the right half of the screen
 
 
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 8000);
   camera.position.x = 3000;
-  camera.position.y = 200;
+  camera.position.y = MAX_CAMERA_Y;
   camera.position.z = 3000;
 
   scene = new THREE.Scene();
@@ -86,15 +87,10 @@ function init() {
   container.addEventListener('pointermove', onPointerMove);
 
   window.addEventListener('resize', onWindowResize);
+  window.addEventListener('wheel', onScroll);
 
-  // const controls = new OrbitControls(camera, renderer.domElement);
-  // controls.minDistance = 20;
-  // controls.maxDistance = 4000;
+  camera.lookAt(0,0,0);
 
-  // // add axis helper
-  // const axesHelper = new THREE.AxesHelper(1000);
-  // scene.add(axesHelper);
-  // add text
 }
 function onWindowResize() {
 
@@ -121,7 +117,8 @@ function onPointerMove(event) {
 
 function onScroll(event) {
 
-  camera.position.z += event.deltaY * 0.05;
+  camera.position.y += event.deltaY * 0.09;
+  camera.position.y = Math.min(camera.position.y, MAX_CAMERA_Y);
 
 }
 
@@ -166,5 +163,7 @@ function render() {
   camera.position.x = 3000 * Math.cos(0.01 * count);
   camera.position.z = 3000 * Math.sin(0.01 * count);
 
-  camera.lookAt(scene.position);
+  // camera.lookAt(scene.position);
+  // camera look at y axis;
+
 }
