@@ -4,7 +4,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // key particle settings here
-const SEPARATION = 200, AMOUNTX = 75, AMOUNTY = 75;
+const SEPARATION = 200, AMOUNTX = 100, AMOUNTY = 100;
 const MAX_CAMERA_Y = 200;
 
 let container, stats;
@@ -88,6 +88,13 @@ function init() {
 
   window.addEventListener('resize', onWindowResize);
   window.addEventListener('wheel', onScroll);
+  //add orbit controls
+  // const controls = new OrbitControls(camera, renderer.domElement);
+  // scene.add(controls);
+
+  // add axis helper
+  const axesHelper = new THREE.AxesHelper(1000);
+  scene.add(axesHelper);
 
   camera.lookAt(0,0,0);
 
@@ -103,8 +110,6 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 
 }
-
-//
 
 function onPointerMove(event) {
 
@@ -163,7 +168,6 @@ function render() {
   camera.position.x = 3000 * Math.cos(0.01 * count);
   camera.position.z = 3000 * Math.sin(0.01 * count);
 
-  // camera.lookAt(scene.position);
-  // camera look at y axis;
+  camera.lookAt(0, camera.position.y, 0);
 
 }
