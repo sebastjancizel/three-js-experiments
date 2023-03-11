@@ -50,7 +50,7 @@ function init() {
       positions[i + 1] = 0; // y
       positions[i + 2] = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2); // z
 
-      scales[j] = 15;
+      scales[j] = 20;
 
       i += 3;
       j++;
@@ -87,9 +87,9 @@ function init() {
 
   window.addEventListener('resize', onWindowResize);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.minDistance = 20;
-  controls.maxDistance = 4000;
+  // const controls = new OrbitControls(camera, renderer.domElement);
+  // controls.minDistance = 20;
+  // controls.maxDistance = 4000;
 
   // // add axis helper
   // const axesHelper = new THREE.AxesHelper(1000);
