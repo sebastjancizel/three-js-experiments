@@ -11,7 +11,7 @@ const SEPARATION = 200,
   AMOUNTY = 100;
 const MAX_CAMERA_Y = 200;
 
-let container, stats;
+let container;
 let camera, scene, renderer;
 
 let plane,
