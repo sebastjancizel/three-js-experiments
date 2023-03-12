@@ -3,18 +3,22 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-import ParticlePlane from './src/particles';
+import ParticlePlane from './particles';
 
 // key particle settings here
-const SEPARATION = 200, AMOUNTX = 100, AMOUNTY = 100;
+const SEPARATION = 200,
+  AMOUNTX = 100,
+  AMOUNTY = 100;
 const MAX_CAMERA_Y = 200;
 
 let container, stats;
 let camera, scene, renderer;
 
-let plane, step = 0;
+let plane,
+  step = 0;
 
-let mouseX = 0, mouseY = 0;
+let mouseX = 0,
+  mouseY = 0;
 
 let windowHalfX = window.innerWidth;
 let windowHalfY = window.innerHeight;
@@ -23,12 +27,16 @@ init();
 animate();
 
 function init() {
-
   container = document.createElement('div');
   document.body.appendChild(container);
 
   // CAMERA
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 8000);
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    1,
+    8000
+  );
   camera.position.x = 3000;
   camera.position.y = MAX_CAMERA_Y;
   camera.position.z = 3000;
@@ -57,11 +65,9 @@ function init() {
   const axesHelper = new THREE.AxesHelper(1000);
   scene.add(axesHelper);
 
-  camera.lookAt(0,0,0);
-
+  camera.lookAt(0, 0, 0);
 }
 function onWindowResize() {
-
   windowHalfX = window.innerWidth / 2;
   windowHalfY = window.innerHeight / 2;
 
@@ -69,25 +75,19 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
 
   renderer.setSize(window.innerWidth, window.innerHeight);
-
 }
 
 function onPointerMove(event) {
-
   if (event.isPrimary === false) return;
 
   mouseX = event.clientX - windowHalfX;
   mouseY = event.clientY - windowHalfY;
-
 }
 
 function onScroll(event) {
-
   camera.position.y = MAX_CAMERA_Y - scrollY;
   camera.position.y = Math.min(camera.position.y, MAX_CAMERA_Y);
-
 }
-
 
 function animate() {
   requestAnimationFrame(animate);
@@ -95,7 +95,6 @@ function animate() {
 }
 
 function render() {
-
   plane.update(step);
   renderer.render(scene, camera);
 
