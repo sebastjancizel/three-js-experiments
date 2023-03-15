@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 
+import vertexShader from './shaders/vertexShader.glsl';
+import fragmentShader from './shaders/fragmentShader.glsl';
+
 //define a particles class with a constructor and update method
 class ParticlePlane {
   constructor(amount_x, amount_y, separation) {
@@ -33,8 +36,8 @@ class ParticlePlane {
       uniforms: {
         color: { value: new THREE.Color(0xffffff) },
       },
-      vertexShader: document.getElementById('vertexshader').textContent,
-      fragmentShader: document.getElementById('fragmentshader').textContent,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
     });
 
     this.geometry.setAttribute(
